@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>PersonaScope</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Color for Safari/Chrome top bar -->
   <meta name="theme-color" content="#050511" />
   <style>
     :root {
@@ -68,7 +67,6 @@
       overflow: hidden;
     }
 
-    /* Empty status bar space */
     .status-bar {
       height: 18px;
       padding: 4px 2px 8px;
@@ -569,7 +567,6 @@
       100% { transform: translateX(100%); }
     }
 
-    /* Story section always under results (shown after first generate) */
     .story-section {
       margin-top: 12px;
       padding-bottom: 4px;
@@ -728,6 +725,7 @@
       color: rgba(160, 160, 195, 0.75);
       text-align: right;
     }
+
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -865,7 +863,6 @@
         </form>
       </section>
 
-      <!-- Normal results -->
       <section class="results-shell" id="results-section">
         <div class="results-header">
           <div class="results-header-title" id="results-title-label">Profile snapshot</div>
@@ -952,7 +949,6 @@
         </div>
       </section>
 
-      <!-- Story prompt under results -->
       <section id="story-share-section" class="story-section hidden">
         <div class="story-header">
           <div class="story-header-title">Story-ready prompt</div>
@@ -989,7 +985,7 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
       </section>
     </main>
 
-        <footer class="footer">
+    <footer class="footer">
       <p></p>
       <div class="footer-right">
         <img src="instagram-icon.png" alt="Instagram logo" class="ig-img" aria-hidden="true" />
@@ -1010,9 +1006,7 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
         </p>
       </div>
     </div>
-  </div> <!-- end .app-shell -->
-</body>
-</html>
+  </div>
 
   <script>
     const form = document.getElementById("search-form");
@@ -1049,6 +1043,10 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
     const btnShareStory = document.getElementById("btn-share-story");
     const btnSaveStory = document.getElementById("btn-save-story");
 
+    const nameModal = document.getElementById("name-modal");
+    const modalTextEl = document.getElementById("modal-text");
+    const modalCloseBtn = document.getElementById("modal-close-btn");
+
     const cards = [
       document.getElementById("card-work"),
       document.getElementById("card-edu"),
@@ -1065,7 +1063,17 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
     const initialTextSocial =
       "Public vibe, typical behaviour and favourite lines.";
 
-    let currentMode = "job"; // "job" | "alt" | "rel"
+    let currentMode = "job";
+
+    const funnyNameMessages = [
+      "You have to enter a real name, I'm sorry for ruining your hopes 😅",
+      "That doesn’t look like a real first + last name. Try something your parents would actually put on a document.",
+      "Nice try, mysterious keyboard smash. PersonaScope only works with real humans 👀",
+      "I respect the creativity, but I need a real first name and last name to cook something properly.",
+      "If this is your real name, I’m impressed. But the app thinks it’s gibberish. Try a more normal one.",
+      "Keyboard smash detected. Please feed me a real name, not Wi-Fi password energy.",
+      "I promise I’ll make it funny, but first: give me an actual human name."
+    ];
 
     function setError(message) {
       if (message) {
@@ -1117,8 +1125,53 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
       return list[(seed + offset) % list.length];
     }
 
+    function looksLikeRealName(name) {
+      const trimmed = name.trim();
+      if (!trimmed) return false;
+
+      const parts = trimmed.split(/\s+/);
+      if (parts.length < 2) return false;
+
+      const vowels = "aeiouăâîșşțţéèíìóòúùüöçñAEIOUĂÂÎȘŞȚŢÉÈÍÌÓÒÚÙÜÖÇÑ";
+
+      for (let i = 0; i < parts.length; i++) {
+        const p = parts[i];
+        if (p.length < 2) return false;
+        if (/[^a-zA-Zăâîșşțţéèíìóòúùüöçñ' -]/.test(p)) return false;
+
+        let hasVowel = false;
+        for (const c of p) {
+          if (vowels.includes(c)) {
+            hasVowel = true;
+            break;
+          }
+        }
+        if (!hasVowel && (i === 0 || i === parts.length - 1)) return false;
+
+        if (/(.)\1\1/.test(p)) return false;
+      }
+      return true;
+    }
+
+    function showNameModal() {
+      const msg =
+        funnyNameMessages[Math.floor(Math.random() * funnyNameMessages.length)];
+      modalTextEl.textContent = msg;
+      nameModal.classList.remove("hidden");
+    }
+
+    modalCloseBtn.addEventListener("click", () => {
+      nameModal.classList.add("hidden");
+    });
+
+    nameModal.addEventListener("click", (e) => {
+      if (e.target === nameModal) {
+        nameModal.classList.add("hidden");
+      }
+    });
+
     async function fetchPersonSummaryMock(fullName, context, mode) {
-      await new Promise((res) => setTimeout(res, 700)); // fake thinking
+      await new Promise((res) => setTimeout(res, 700));
 
       const base = (fullName + " " + (context || "")).trim() || "Someone";
       const seed = hashString(base.toLowerCase());
@@ -1131,7 +1184,6 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
         minute: "2-digit"
       });
 
-      // Shared fun stuff for story text + job mode
       const funTitles = [
         "Chief Vibes Officer",
         "Professional Overthinker",
@@ -1224,7 +1276,6 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
         `Energy: ${trait}. They tend to ${power} and their biggest weakness is that they ${weakness}.\n` +
         `${hook}`;
 
-      // Alt universe mode
       if (mode === "alt") {
         const worlds = [
           "a neon-soaked cyber city",
@@ -1323,7 +1374,6 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
         };
       }
 
-      // Relationship vibes mode
       if (mode === "rel") {
         const energies = [
           "golden retriever energy in human form",
@@ -1440,7 +1490,6 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
         };
       }
 
-      // Default: fun job profile
       return {
         full_name: displayName,
         context,
@@ -1519,10 +1568,163 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
         }
       });
 
-      // Update story card under results
       storyNameEl.textContent = data.full_name || "Your name here";
       storyTextEl.textContent = data.story_text || "";
       storySection.classList.remove("hidden");
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(" ");
+      let line = "";
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + " ";
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+        if (testWidth > maxWidth && n > 0) {
+          ctx.fillText(line, x, y);
+          line = words[n] + " ";
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, y);
+      return y;
+    }
+
+    function buildStoryCanvas(name, text) {
+      const width = 1080;
+      const height = 810; // 4:3
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+
+      const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+      bgGrad.addColorStop(0, "#272244");
+      bgGrad.addColorStop(0.5, "#1a1333");
+      bgGrad.addColorStop(1, "#120f25");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      const radial1 = ctx.createRadialGradient(0, 0, 0, 0, 0, width * 0.7);
+      radial1.addColorStop(0, "rgba(255,255,255,0.20)");
+      radial1.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = radial1;
+      ctx.fillRect(0, 0, width, height);
+
+      const radial2 = ctx.createRadialGradient(width, 0, 0, width, 0, width * 0.7);
+      radial2.addColorStop(0, "rgba(155,123,255,0.35)");
+      radial2.addColorStop(1, "rgba(155,123,255,0)");
+      ctx.fillStyle = radial2;
+      ctx.fillRect(0, 0, width, height);
+
+      const radial3 = ctx.createRadialGradient(0, height, 0, 0, height, width * 0.7);
+      radial3.addColorStop(0, "rgba(0,215,255,0.35)");
+      radial3.addColorStop(1, "rgba(0,215,255,0)");
+      ctx.fillStyle = radial3;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.fillStyle = "rgba(5,5,16,0.9)";
+      const chipX = 80;
+      const chipY = 90;
+      const chipW = 260;
+      const chipH = 40;
+      const r = 20;
+      ctx.beginPath();
+      ctx.moveTo(chipX + r, chipY);
+      ctx.lineTo(chipX + chipW - r, chipY);
+      ctx.quadraticCurveTo(chipX + chipW, chipY, chipX + chipW, chipY + r);
+      ctx.lineTo(chipX + chipW, chipY + chipH - r);
+      ctx.quadraticCurveTo(chipX + chipW, chipY + chipH, chipX + chipW - r, chipY + chipH);
+      ctx.lineTo(chipX + r, chipY + chipH);
+      ctx.quadraticCurveTo(chipX, chipY + chipH, chipX, chipY + chipH - r);
+      ctx.lineTo(chipX, chipY + r);
+      ctx.quadraticCurveTo(chipX, chipY, chipX + r, chipY);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = "rgba(255,255,255,0.25)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(233,233,255,0.95)";
+      ctx.font = "600 24px -apple-system, system-ui, sans-serif";
+      ctx.fillText("PersonaScope • Story", chipX + 18, chipY + 26);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "600 40px -apple-system, system-ui, sans-serif";
+      ctx.fillText(name || "Your name here", 80, 170);
+
+      ctx.fillStyle = "rgba(232,234,255,0.96)";
+      ctx.font = "26px -apple-system, system-ui, sans-serif";
+      const textStartY = 210;
+      wrapText(ctx, text || "", 80, textStartY, width - 160, 38);
+
+      ctx.textAlign = "right";
+      ctx.fillStyle = "rgba(231,236,255,0.98)";
+      ctx.font = "bold 26px -apple-system, system-ui, sans-serif";
+      ctx.fillText("@alexandru.fn", width - 80, height - 80);
+      ctx.font = "22px -apple-system, system-ui, sans-serif";
+      ctx.fillText("Made by Ali.", width - 80, height - 50);
+      ctx.textAlign = "left";
+
+      return canvas;
+    }
+
+    function downloadStoryImage(name, text) {
+      const canvas = buildStoryCanvas(name, text);
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png");
+      link.download = "personascope-story.png";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function fallbackShareText(text) {
+      const payloadText =
+        text + "\n\nGenerated with PersonaScope – " + window.location.href;
+      if (navigator.share) {
+        navigator.share({ text: payloadText }).catch(() => {});
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(payloadText).then(() => {
+          alert("Story text copied. Paste it into Instagram, WhatsApp, etc.");
+        }).catch(() => {
+          alert("Couldn’t share automatically. You can copy the text manually.");
+        });
+      } else {
+        alert("Sharing isn’t available here. You can screenshot or copy the text manually.");
+      }
+    }
+
+    function shareStoryImage(name, text) {
+      const canvas = buildStoryCanvas(name, text);
+
+      if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({ files: [] })
+      ) {
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            fallbackShareText(text);
+            return;
+          }
+          const file = new File([blob], "personascope-story.png", {
+            type: "image/png"
+          });
+          const data = {
+            files: [file],
+            text: "Generated with PersonaScope"
+          };
+          navigator.share(data).catch(() => {
+            fallbackShareText(text);
+          });
+        }, "image/png");
+      } else {
+        fallbackShareText(text);
+      }
     }
 
     async function handleSearch(event) {
@@ -1534,8 +1736,14 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
         setError("Please enter a full name before generating.");
         return;
       }
-      setError("");
 
+      if (!looksLikeRealName(fullName)) {
+        setError("");
+        showNameModal();
+        return;
+      }
+
+      setError("");
       setLoading(true);
 
       try {
@@ -1565,140 +1773,15 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
       });
     });
 
-    // Brand click = reset app
     brandHome.addEventListener("click", () => {
       window.location.reload();
     });
 
-    // Simple text wrapping helper for canvas
-    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-      const words = text.split(" ");
-      let line = "";
-      for (let n = 0; n < words.length; n++) {
-        const testLine = line + words[n] + " ";
-        const metrics = ctx.measureText(testLine);
-        const testWidth = metrics.width;
-        if (testWidth > maxWidth && n > 0) {
-          ctx.fillText(line, x, y);
-          line = words[n] + " ";
-          y += lineHeight;
-        } else {
-          line = testLine;
-        }
-      }
-      ctx.fillText(line, x, y);
-      return y;
-    }
-
-    function generateStoryImage(name, text) {
-      const width = 1080;
-      const height = 810; // 4:3
-      const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext("2d");
-
-      // Background gradient
-      const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-      bgGrad.addColorStop(0, "#272244");
-      bgGrad.addColorStop(0.5, "#1a1333");
-      bgGrad.addColorStop(1, "#120f25");
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, width, height);
-
-      // Soft overlay circles
-      const radial1 = ctx.createRadialGradient(0, 0, 0, 0, 0, width * 0.7);
-      radial1.addColorStop(0, "rgba(255,255,255,0.20)");
-      radial1.addColorStop(1, "rgba(255,255,255,0)");
-      ctx.fillStyle = radial1;
-      ctx.fillRect(0, 0, width, height);
-
-      const radial2 = ctx.createRadialGradient(width, 0, 0, width, 0, width * 0.7);
-      radial2.addColorStop(0, "rgba(155,123,255,0.35)");
-      radial2.addColorStop(1, "rgba(155,123,255,0)");
-      ctx.fillStyle = radial2;
-      ctx.fillRect(0, 0, width, height);
-
-      const radial3 = ctx.createRadialGradient(0, height, 0, 0, height, width * 0.7);
-      radial3.addColorStop(0, "rgba(0,215,255,0.35)");
-      radial3.addColorStop(1, "rgba(0,215,255,0)");
-      ctx.fillStyle = radial3;
-      ctx.fillRect(0, 0, width, height);
-
-      // Story chip
-      ctx.fillStyle = "rgba(5,5,16,0.9)";
-      const chipX = 80;
-      const chipY = 90;
-      const chipW = 260;
-      const chipH = 40;
-      const r = 20;
-      ctx.beginPath();
-      ctx.moveTo(chipX + r, chipY);
-      ctx.lineTo(chipX + chipW - r, chipY);
-      ctx.quadraticCurveTo(chipX + chipW, chipY, chipX + chipW, chipY + r);
-      ctx.lineTo(chipX + chipW, chipY + chipH - r);
-      ctx.quadraticCurveTo(chipX + chipW, chipY + chipH, chipX + chipW - r, chipY + chipH);
-      ctx.lineTo(chipX + r, chipY + chipH);
-      ctx.quadraticCurveTo(chipX, chipY + chipH, chipX, chipY + chipH - r);
-      ctx.lineTo(chipX, chipY + r);
-      ctx.quadraticCurveTo(chipX, chipY, chipX + r, chipY);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.strokeStyle = "rgba(255,255,255,0.25)";
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      ctx.fillStyle = "rgba(233,233,255,0.95)";
-      ctx.font = "600 24px -apple-system, system-ui, sans-serif";
-      ctx.fillText("PersonaScope • Story", chipX + 18, chipY + 26);
-
-      // Name
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "600 40px -apple-system, system-ui, sans-serif";
-      ctx.fillText(name || "Your name here", 80, 170);
-
-      // Main text
-      ctx.fillStyle = "rgba(232,234,255,0.96)";
-      ctx.font = "26px -apple-system, system-ui, sans-serif";
-      const textStartY = 210;
-      const endY = wrapText(ctx, text || "", 80, textStartY, width - 160, 38);
-
-      // Footer (handle + made by) bottom right
-      ctx.textAlign = "right";
-      ctx.fillStyle = "rgba(231,236,255,0.98)";
-      ctx.font = "bold 26px -apple-system, system-ui, sans-serif";
-      ctx.fillText("@alexandru.fn", width - 80, height - 80);
-      ctx.font = "22px -apple-system, system-ui, sans-serif";
-      ctx.fillText("Made by Ali.", width - 80, height - 50);
-      ctx.textAlign = "left";
-
-      const link = document.createElement("a");
-      link.href = canvas.toDataURL("image/png");
-      link.download = "personascope-story.png";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
     btnShareStory.addEventListener("click", () => {
+      const name = storyNameEl.textContent.trim() || "Your name here";
       const text = storyTextEl.textContent.trim();
       if (!text) return;
-      const payload = {
-        text: text + "\n\nGenerated with PersonaScope",
-        url: window.location.href
-      };
-      if (navigator.share) {
-        navigator.share(payload).catch(() => {});
-      } else if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(payload.text).then(() => {
-          alert("Story text copied. Paste it into Instagram, WhatsApp, etc.");
-        }).catch(() => {
-          alert("Couldn’t share automatically. You can copy the text manually.");
-        });
-      } else {
-        alert("Sharing isn’t available here. You can screenshot or copy the text manually.");
-      }
+      shareStoryImage(name, text);
     });
 
     btnSaveStory.addEventListener("click", () => {
@@ -1708,15 +1791,10 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
         alert("Generate a story first.");
         return;
       }
-      generateStoryImage(name, text);
+      downloadStoryImage(name, text);
     });
 
-    // Initial state
     applyModeUI(currentMode);
   </script>
 </body>
 </html>
-
-
-
-
