@@ -989,17 +989,30 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
       </section>
     </main>
 
-    <footer class="footer">
-  <p></p>
-  <div class="footer-right">
-    <img src="instagram-icon.png" alt="Instagram logo" class="ig-img" aria-hidden="true" />
-    <a href="https://www.instagram.com/alexandru.fn/" target="_blank" rel="noopener noreferrer">
-      Developer's Instagram
-    </a>
-  </div>
-</footer>
+        <footer class="footer">
+      <p></p>
+      <div class="footer-right">
+        <img src="instagram-icon.png" alt="Instagram logo" class="ig-img" aria-hidden="true" />
+        <a href="https://www.instagram.com/alexandru.fn/" target="_blank" rel="noopener noreferrer">
+          Developer's Instagram
+        </a>
+      </div>
+    </footer>
     <div class="made-by">Made by Ali.</div>
-  </div>
+
+    <!-- Name validation modal -->
+    <div id="name-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <button class="modal-close" id="modal-close-btn">×</button>
+        <h2 class="modal-title">Real name, please 🙏</h2>
+        <p class="modal-body" id="modal-text">
+          You have to enter a real name, I'm sorry for ruining your hopes 😅
+        </p>
+      </div>
+    </div>
+  </div> <!-- end .app-shell -->
+</body>
+</html>
 
   <script>
     const form = document.getElementById("search-form");
@@ -1703,6 +1716,7 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
   </script>
 </body>
 </html>
+
 
 
 
