@@ -728,6 +728,51 @@
       color: rgba(160, 160, 195, 0.75);
       text-align: right;
     }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 30;
+    }
+
+    .modal-card {
+      position: relative;
+      max-width: 280px;
+      border-radius: 24px;
+      padding: 14px 14px 16px;
+      background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.18), transparent 60%),
+                  rgba(11, 11, 25, 0.97);
+      border: 0.5px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9);
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    .modal-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .modal-body {
+      font-size: 12px;
+      color: var(--text-soft);
+      line-height: 1.4;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 6px;
+      right: 10px;
+      border: none;
+      background: none;
+      color: rgba(220, 220, 255, 0.9);
+      font-size: 16px;
+      cursor: pointer;
+    }
 
     @media (min-width: 768px) {
       body {
@@ -1658,5 +1703,6 @@ Tap "Generate" to get a short text you can post on Instagram, WhatsApp, or anywh
   </script>
 </body>
 </html>
+
 
 
